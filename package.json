@@ -1,0 +1,31 @@
+{
+  "name": "mirror-digital-human-trainer",
+  "version": "1.0.0",
+  "private": true,
+  "description": "镜界 MIRROR · AI 数字人陪练 Windows Demo",
+  "main": "desktop/main.js",
+  "scripts": {
+    "start": "python main.py",
+    "server": "python main.py",
+    "electron": "electron .",
+    "dist": "electron-builder --win portable"
+  },
+  "devDependencies": {
+    "electron": "^33.2.0",
+    "electron-builder": "^25.1.8"
+  },
+  "build": {
+    "appId": "com.mirror.digitaltrainer",
+    "productName": "MirrorTrainer",
+    "directories": { "output": "dist" },
+    "files": [
+      "desktop/**/*",
+      "main.py",
+      "public/**/*",
+      "data/scenarios/**/*",
+      "data/config.example.json",
+      "package.json"
+    ],
+    "win": { "target": ["portable"] }
+  }
+}
