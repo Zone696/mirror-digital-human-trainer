@@ -64,162 +64,27 @@
         </div>
 
         <div class="avatar-box">
-          <svg id="avatar" viewBox="0 0 420 500" preserveAspectRatio="xMidYMax meet" aria-label="数字人形象">
-            <defs>
-              <linearGradient id="gSkin" x1="0" y1="0" x2="0.3" y2="1">
-                <stop offset="0" stop-color="#fadfc6"/><stop offset="0.55" stop-color="#f3cba9"/><stop offset="1" stop-color="#e6b48e"/>
-              </linearGradient>
-              <linearGradient id="gSkinShade" x1="0" y1="0" x2="1" y2="0">
-                <stop offset="0" stop-color="#d69c74"/><stop offset="1" stop-color="#eab995"/>
-              </linearGradient>
-              <linearGradient id="gHairAva" x1="0" y1="0" x2="0.4" y2="1">
-                <stop offset="0" stop-color="#5d4232"/><stop offset="0.5" stop-color="#402c20"/><stop offset="1" stop-color="#2b1d14"/>
-              </linearGradient>
-              <linearGradient id="gHairLeo" x1="0" y1="0" x2="0.4" y2="1">
-                <stop offset="0" stop-color="#38414d"/><stop offset="0.6" stop-color="#252c35"/><stop offset="1" stop-color="#161b22"/>
-              </linearGradient>
-              <linearGradient id="gBlazer" x1="0" y1="0" x2="0.7" y2="1">
-                <stop offset="0" stop-color="#41607a"/><stop offset="0.55" stop-color="#2c4658"/><stop offset="1" stop-color="#1d3240"/>
-              </linearGradient>
-              <linearGradient id="gShirt" x1="0" y1="0" x2="0" y2="1">
-                <stop offset="0" stop-color="#faf6ee"/><stop offset="1" stop-color="#e2d9c6"/>
-              </linearGradient>
-              <linearGradient id="gRim" x1="0" y1="0" x2="1" y2="0.4">
-                <stop offset="0" stop-color="#4fe0c0" stop-opacity="0"/><stop offset="1" stop-color="#7cf3db"/>
-              </linearGradient>
-              <linearGradient id="gLips" x1="0" y1="0" x2="0" y2="1">
-                <stop offset="0" stop-color="#cd7269"/><stop offset="1" stop-color="#b35650"/>
-              </linearGradient>
-              <radialGradient id="gHalo" cx="0.5" cy="0.5" r="0.5">
-                <stop offset="0" stop-color="#4fe0c0" stop-opacity="0.28"/>
-                <stop offset="0.6" stop-color="#4fe0c0" stop-opacity="0.06"/>
-                <stop offset="1" stop-color="#4fe0c0" stop-opacity="0"/>
-              </radialGradient>
-              <linearGradient id="gShoulderLight" x1="0" y1="0" x2="1" y2="0">
-                <stop offset="0" stop-color="#4fe0c0" stop-opacity="0"/>
-                <stop offset="0.5" stop-color="#4fe0c0" stop-opacity="0.65"/>
-                <stop offset="1" stop-color="#4fe0c0" stop-opacity="0"/>
-              </linearGradient>
-            </defs>
-
-            <ellipse cx="210" cy="300" rx="180" ry="180" fill="url(#gHalo)"/>
-
-            <!-- 身体 -->
-            <g id="avBody">
-              <!-- 颈 -->
-              <path d="M192 280h36l6 66h-48z" fill="url(#gSkinShade)"/>
-              <path d="M192 280h36l2 22c-12 10-28 10-40 0z" fill="#cf9873" opacity=".5"/>
-              <!-- 西装 -->
-              <path d="M40 500c8-70 52-118 104-144l66 48 66-48c52 26 96 74 104 144z" fill="url(#gBlazer)"/>
-              <!-- 衬衫与领口 -->
-              <path d="M194 346h32v26l-16 22-16-22z" fill="url(#gShirt)"/>
-              <path d="M194 346l16 22-6 10-18-26z" fill="#fffdf6"/>
-              <path d="M226 346l-16 22 6 10 18-26z" fill="#ece4d2"/>
-              <!-- 翻领 -->
-              <path d="M186 346l24 50-16 104-34-142z" fill="#233a4b"/>
-              <path d="M234 346l-24 50 16 104 34-142z" fill="#2a4356"/>
-              <path d="M186 346l24 50-5 8-27-54z" fill="#33506a" opacity=".85"/>
-              <path d="M234 346l-24 50 5 8 27-54z" fill="#3b5c78" opacity=".85"/>
-              <path d="M210 396V500" stroke="#132430" stroke-width="1.6" opacity=".65"/>
-              <!-- 肩部轮廓光 -->
-              <path d="M62 480c10-38 38-64 70-80" stroke="url(#gShoulderLight)" stroke-width="2.6" fill="none" opacity=".6"/>
-              <path d="M358 480c-10-38-38-64-70-80" stroke="url(#gShoulderLight)" stroke-width="2.2" fill="none" opacity=".38"/>
-            </g>
-
-            <!-- 头部 -->
-            <g id="avHead">
-              <!-- 后发 -->
-              <g id="avHairBack">
-                <path d="M102 344c-22-82-24-172 6-218 26-40 70-58 102-58s76 18 102 58c30 46 28 136 6 218-4-58-16-112-34-142-24-32-52-46-74-46s-50 14-74 46c-18 30-30 84-34 142z" fill="url(#gHairAva)"/>
-                <path d="M118 216c-10 46-10 100-6 136 12-16 18-54 18-90z" fill="#412d20" opacity=".85"/>
-                <path d="M302 216c10 46 10 100 6 136-12-16-18-54-18-90z" fill="#412d20" opacity=".85"/>
+          <div class="avatar-photo" id="avatarPhoto">
+            <img id="avatarImgAva" src="/assets/ava.jpg" alt="Ava" draggable="false" />
+            <img id="avatarImgLeo" src="/assets/leo.jpg" alt="Leo" draggable="false" hidden />
+            <svg id="avatar" viewBox="0 0 1680 2240" preserveAspectRatio="xMidYMid meet" aria-hidden="true">
+              <defs>
+                <filter id="fPatch" x="-40%" y="-40%" width="180%" height="180%">
+                  <feGaussianBlur stdDeviation="26"/>
+                </filter>
+                <filter id="fSoft" x="-40%" y="-40%" width="180%" height="180%">
+                  <feGaussianBlur stdDeviation="6"/>
+                </filter>
+              </defs>
+              <g id="avMouth" opacity="0">
+                <ellipse id="mouthPatch" cx="840" cy="1190" rx="175" ry="115" fill="#d0b09e" filter="url(#fPatch)"/>
+                <path id="mouthCavity" d="" fill="#7d3a37"/>
+                <rect id="mouthTeeth" x="800" y="1174" width="80" height="20" rx="10" fill="#f0e2d4" opacity="0" filter="url(#fSoft)"/>
+                <path id="mouthUpper" d="" fill="none" stroke="#b5564f" stroke-width="12" stroke-linecap="round" filter="url(#fSoft)"/>
+                <path id="mouthLower" d="" fill="none" stroke="#c96a63" stroke-width="13" stroke-linecap="round" filter="url(#fSoft)"/>
               </g>
-
-              <!-- 耳朵 -->
-              <ellipse cx="131" cy="196" rx="11" ry="18" fill="url(#gSkinShade)"/>
-              <ellipse cx="289" cy="196" rx="11" ry="18" fill="url(#gSkinShade)"/>
-
-              <!-- 脸 -->
-              <path d="M210 88c44 0 76 30 78 80 2 40-14 78-38 99-13 12-27 19-40 19s-27-7-40-19c-24-21-40-59-38-99 2-50 34-80 78-80z" fill="url(#gSkin)"/>
-
-              <!-- 腮红 -->
-              <ellipse cx="166" cy="230" rx="15" ry="9" fill="#f2a48c" opacity=".22"/>
-              <ellipse cx="254" cy="230" rx="15" ry="9" fill="#f2a48c" opacity=".22"/>
-
-              <!-- 前发 Ava -->
-              <g id="avHairAva">
-                <path d="M124 190c-6-70 28-116 86-116s92 46 86 116c-6-54-34-82-86-82s-80 28-86 82z" fill="url(#gHairAva)"/>
-                <path d="M134 156c4-42 36-68 76-68s72 26 76 68c-14-18-30-28-48-26-20 2-34 10-46 22-14 14-40 20-58 4z" fill="url(#gHairAva)"/>
-                <path d="M164 102c14-8 30-11 46-11" stroke="#6b4d3a" stroke-width="2" fill="none" opacity=".5"/>
-                <path d="M148 132c6-14 16-24 28-30" stroke="#6b4d3a" stroke-width="1.6" fill="none" opacity=".4"/>
-                <path d="M126 198c-4 42-2 88 6 122 6-20 8-58 6-98z" fill="#3a281d" opacity=".9"/>
-                <path d="M294 198c4 42 2 88-6 122-6-20-8-58-6-98z" fill="#3a281d" opacity=".9"/>
-              </g>
-
-              <!-- 前发 Leo -->
-              <g id="avHairLeo" style="display:none">
-                <path d="M124 190c-6-70 28-116 86-116s92 46 86 116c-6-54-34-82-86-82s-80 28-86 82z" fill="url(#gHairLeo)"/>
-                <path d="M128 160c0-48 38-78 82-78s82 30 82 78c-8-26-24-40-42-42-22-2-38 6-50 18-14 12-36 26-72 24z" fill="url(#gHairLeo)"/>
-                <path d="M124 162c-4 12-4 26 0 34 4-6 6-20 4-30z" fill="#1c222a"/>
-                <path d="M296 162c4 12 4 26 0 34-4-6-6-20-4-30z" fill="#1c222a"/>
-              </g>
-
-              <!-- 眉毛 -->
-              <g id="avBrows" fill="none" stroke="#36261e" stroke-width="3.8" stroke-linecap="round">
-                <path d="M163 170c11-6 24-7 35-2"/>
-                <path d="M222 168c11-5 24-4 35 2"/>
-              </g>
-
-              <!-- 眼睛 -->
-              <g id="avEyes">
-                <g class="eye eye-l">
-                  <path d="M168 193q6.5-8 13-8t13 8q-6.5 7.5-13 7.5t-13-7.5z" fill="#fdf8f1"/>
-                  <g class="iris" data-cx="182" data-cy="193">
-                    <circle cx="182" cy="193" r="6.8" fill="#63452f"/>
-                    <circle cx="182" cy="193" r="2.9" fill="#20140d"/>
-                    <circle cx="184.2" cy="190.6" r="1.9" fill="#fff" opacity=".9"/>
-                  </g>
-                  <path d="M167 192q6-7.5 13.5-8t14 6.5" stroke="#2c1f18" stroke-width="2.6" fill="none" opacity=".85" stroke-linecap="round"/>
-                  <path d="M169 197q6 3.5 13 3.5t13-3.5" stroke="#d69b7c" stroke-width="1.2" fill="none" opacity=".5" stroke-linecap="round"/>
-                </g>
-                <g class="eye eye-r">
-                  <path d="M224 193q6.5-8 13-8t13 8q-6.5 7.5-13 7.5t-13-7.5z" fill="#fdf8f1"/>
-                  <g class="iris" data-cx="238" data-cy="193">
-                    <circle cx="238" cy="193" r="6.8" fill="#63452f"/>
-                    <circle cx="238" cy="193" r="2.9" fill="#20140d"/>
-                    <circle cx="240.2" cy="190.6" r="1.9" fill="#fff" opacity=".9"/>
-                  </g>
-                  <path d="M223 192q6-7.5 13.5-8t14 6.5" stroke="#2c1f18" stroke-width="2.6" fill="none" opacity=".85" stroke-linecap="round"/>
-                  <path d="M225 197q6 3.5 13 3.5t13-3.5" stroke="#d69b7c" stroke-width="1.2" fill="none" opacity=".5" stroke-linecap="round"/>
-                </g>
-              </g>
-
-              <!-- 鼻子 -->
-              <path d="M212 200c-2 8-4 14-1 18 2 2 5 1.4 7-0.6" fill="none" stroke="#d69b78" stroke-width="2" stroke-linecap="round" opacity=".75"/>
-              <ellipse cx="206" cy="222" rx="2" ry="1.2" fill="#c1866a" opacity=".5"/>
-              <ellipse cx="215" cy="222" rx="2" ry="1.2" fill="#c1866a" opacity=".4"/>
-
-              <!-- 嘴 -->
-              <g id="avMouth">
-                <path id="mouthCavity" d="" fill="#7a3b3b"/>
-                <rect id="mouthTeeth" x="200" y="245" width="20" height="4.6" rx="2.3" fill="#fff6ec" opacity="0"/>
-                <path id="mouthUpper" d="" fill="none" stroke="url(#gLips)" stroke-width="3.4" stroke-linecap="round"/>
-                <path id="mouthLower" d="" fill="none" stroke="#d17e74" stroke-width="4" stroke-linecap="round"/>
-              </g>
-
-              <!-- 耳麦 -->
-              <g id="avHeadset" opacity=".95">
-                <path d="M136 186c2-52 32-84 74-84s72 32 74 84" stroke="#2e3f4d" stroke-width="4" fill="none" stroke-linecap="round"/>
-                <rect x="122" y="180" width="14" height="28" rx="7" fill="#24333f" transform="rotate(-6 129 194)"/>
-                <circle cx="129" cy="194" r="2.2" fill="#4fe0c0" opacity=".85"/>
-                <path d="M129 208c7 16 20 28 41 36" stroke="#2e3f4d" stroke-width="3.2" fill="none" stroke-linecap="round"/>
-                <rect x="170" y="240" width="17" height="8" rx="4" fill="#24333f" transform="rotate(12 178 244)"/>
-              </g>
-
-              <!-- 轮廓光 -->
-              <path d="M288 140c10 28 10 66-2 96-10 26-30 48-52 60" fill="none" stroke="url(#gRim)" stroke-width="2.4" opacity=".5" stroke-linecap="round"/>
-            </g>
-          </svg>
+            </svg>
+          </div>
 
           <div class="avatar-name">
             <strong id="avatarName">Ava</strong>
