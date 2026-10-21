@@ -1,0 +1,11 @@
+node_modules/
+dist/
+__pycache__/
+*.pyc
+.DS_Store
+
+# 本地密钥与会话数据：不要提交到公开仓库
+data/config.json
+data/config.json.tmp
+data/sessions/*.json
+!data/sessions/.gitkeep
