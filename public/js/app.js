@@ -90,7 +90,20 @@
   async function init() {
     buildWave();
     avatar = new window.DigitalAvatar($("#avatar"));
+    window.__avatar = avatar; // 调试/测试用句柄
     engine = new window.SpeechEngine();
+
+    // 调试钩子：?testmouth=0.85 固定说话能量，便于无头截图验证口型对齐
+    const qp = new URLSearchParams(location.search);
+    if (qp.has("testmouth")) {
+      const v = Math.max(0, Math.min(1, parseFloat(qp.get("testmouth")) || 0.85));
+      state.speaking = true;
+      engine.getPlaybackLevel = () => v;
+      avatar.setState("speaking");
+      avatar.setEnergy(v);
+      setStageState("speaking");
+      if (qp.get("avatar")) avatar.setVariant(qp.get("avatar"));
+    }
     engine.onVoices = (voices) => {
       state.voiceList = voices || [];
       fillVoiceSelect();
