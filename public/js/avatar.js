@@ -1,35 +1,56 @@
 /* ============================================================
-   数字人渲染器：SVG 实时驱动（呼吸 / 眨眼 / 注视 / 口型同步）
+   数字人渲染器：写实照片 + SVG 口型叠加（呼吸 / 头部微动 / 嘴型同步）
    ============================================================ */
 (function () {
   "use strict";
 
-  const MOUTH = { cx: 210, cy: 250, half: 25 };
+  const VARIANTS = {
+    ava: {
+      cx: 840,
+      cy: 1190,
+      half: 92,
+      openPx: 62,
+      patch: { rx: 175, ry: 115, fill: "#d0b09e" },
+      lip: "#b5564f",
+      lipLower: "#c96a63",
+      cavity: "#7d3a37",
+      imgId: "avatarImgAva",
+    },
+    leo: {
+      cx: 845,
+      cy: 1320,
+      half: 75,
+      openPx: 55,
+      patch: { rx: 140, ry: 95, fill: "#b58c7a" },
+      lip: "#9d564f",
+      lipLower: "#b06058",
+      cavity: "#6e332f",
+      imgId: "avatarImgLeo",
+    },
+  };
 
   class DigitalAvatar {
     constructor(svg) {
       this.svg = svg;
-      this.state = "idle";
-      this.variant = "ava";
-      this.energy = null;      // 外部音频能量 0~1；null 表示使用程序化口型
-      this.level = 0;          // 平滑后的口型开合
-      this.blink = 0;
-      this.nextBlink = performance.now() + 2200;
-      this.blinkStart = 0;
-      this.startTime = performance.now();
-      this.raf = null;
-
-      this.head = svg.querySelector("#avHead");
-      this.brows = svg.querySelector("#avBrows");
-      this.eyes = Array.from(svg.querySelectorAll(".eye"));
-      this.irises = Array.from(svg.querySelectorAll(".iris"));
+      this.container = svg.closest(".avatar-photo");
+      this.imgs = {
+        ava: document.getElementById("avatarImgAva"),
+        leo: document.getElementById("avatarImgLeo"),
+      };
+      this.mouth = svg.querySelector("#avMouth");
+      this.patch = svg.querySelector("#mouthPatch");
       this.cavity = svg.querySelector("#mouthCavity");
       this.upper = svg.querySelector("#mouthUpper");
       this.lower = svg.querySelector("#mouthLower");
       this.teeth = svg.querySelector("#mouthTeeth");
-      this.hairAva = svg.querySelector("#avHairAva");
-      this.hairLeo = svg.querySelector("#avHairLeo");
-      this.hairBack = svg.querySelector("#avHairBack");
+
+      this.state = "idle";
+      this.variant = "ava";
+      this.cfg = VARIANTS.ava;
+      this.energy = null;
+      this.level = 0;
+      this.startTime = performance.now();
+      this.raf = null;
 
       this.drawMouth(0.02, 0);
       this.loop = this.loop.bind(this);
@@ -38,10 +59,23 @@
 
     setVariant(variant) {
       this.variant = variant === "leo" ? "leo" : "ava";
-      const isLeo = this.variant === "leo";
-      this.hairAva.style.display = isLeo ? "none" : "";
-      this.hairLeo.style.display = isLeo ? "" : "none";
-      this.hairBack.style.display = isLeo ? "none" : "";
+      this.cfg = VARIANTS[this.variant];
+      const c = this.cfg;
+
+      if (this.imgs.ava) this.imgs.ava.hidden = this.variant !== "ava";
+      if (this.imgs.leo) this.imgs.leo.hidden = this.variant !== "leo";
+
+      if (this.patch) {
+        this.patch.setAttribute("cx", c.cx);
+        this.patch.setAttribute("cy", c.cy);
+        this.patch.setAttribute("rx", c.patch.rx);
+        this.patch.setAttribute("ry", c.patch.ry);
+        this.patch.setAttribute("fill", c.patch.fill);
+      }
+      if (this.cavity) this.cavity.setAttribute("fill", c.cavity);
+      if (this.upper) this.upper.setAttribute("stroke", c.lip);
+      if (this.lower) this.lower.setAttribute("stroke", c.lipLower);
+      this.drawMouth(this.level, 0.25);
     }
 
     setState(next) {
@@ -53,32 +87,37 @@
     }
 
     drawMouth(open, smile) {
-      const { cx, cy, half } = MOUTH;
-      const hw = half * (1 + 0.04 * Math.sin(performance.now() / 220));
-      const bottom = cy + 5 + open * 30;
-      const cornerY = cy - smile * 1.6;
+      const { cx, cy, half, openPx } = this.cfg;
+      const hw = half * (1 + 0.05 * Math.sin(performance.now() / 220));
+      const bottom = cy + 8 + open * openPx;
+      const cornerY = cy - smile * 6;
 
       this.cavity.setAttribute(
         "d",
-        `M ${cx - hw} ${cornerY} Q ${cx - hw * 0.55} ${cy - 6} ${cx} ${cy - 5}` +
-        ` Q ${cx + hw * 0.55} ${cy - 6} ${cx + hw} ${cornerY}` +
-        ` Q ${cx + hw * 0.5} ${bottom} ${cx} ${bottom}` +
-        ` Q ${cx - hw * 0.5} ${bottom} ${cx - hw} ${cornerY} Z`
+        `M ${cx - hw} ${cornerY} Q ${cx - hw * 0.55} ${cy - 22} ${cx} ${cy - 18}` +
+          ` Q ${cx + hw * 0.55} ${cy - 22} ${cx + hw} ${cornerY}` +
+          ` Q ${cx + hw * 0.5} ${bottom} ${cx} ${bottom}` +
+          ` Q ${cx - hw * 0.5} ${bottom} ${cx - hw} ${cornerY} Z`
       );
       this.upper.setAttribute(
         "d",
-        `M ${cx - hw} ${cornerY} Q ${cx - hw * 0.5} ${cy - 7.5} ${cx} ${cy - 5.5}` +
-        ` Q ${cx + hw * 0.5} ${cy - 7.5} ${cx + hw} ${cornerY}`
+        `M ${cx - hw} ${cornerY} Q ${cx - hw * 0.5} ${cy - 26} ${cx} ${cy - 20}` +
+          ` Q ${cx + hw * 0.5} ${cy - 26} ${cx + hw} ${cornerY}`
       );
       this.lower.setAttribute(
         "d",
-        `M ${cx - hw} ${cornerY} Q ${cx - hw * 0.5} ${bottom + 1.5} ${cx} ${bottom + 1.5}` +
-        ` Q ${cx + hw * 0.5} ${bottom + 1.5} ${cx + hw} ${cornerY}`
+        `M ${cx - hw} ${cornerY} Q ${cx - hw * 0.5} ${bottom + 5} ${cx} ${bottom + 5}` +
+          ` Q ${cx + hw * 0.5} ${bottom + 5} ${cx + hw} ${cornerY}`
       );
       const teethW = Math.max(0, hw * 1.1 * Math.min(1, open * 2.4));
       this.teeth.setAttribute("x", String(cx - teethW / 2));
+      this.teeth.setAttribute("y", String(cy - 16));
       this.teeth.setAttribute("width", String(teethW));
-      this.teeth.setAttribute("opacity", open > 0.34 ? "0.9" : "0");
+      this.teeth.setAttribute("opacity", open > 0.55 ? "0.55" : "0");
+      // 开合小时完全隐藏，露出真实闭唇照片
+      if (this.mouth) {
+        this.mouth.setAttribute("opacity", Math.min(1, Math.max(0, (open - 0.08) * 5)).toFixed(3));
+      }
     }
 
     loop(now) {
@@ -92,7 +131,6 @@
         if (this.energy !== null) {
           target = 0.08 + this.energy * 0.92;
         } else {
-          // 程序化口型：多频正弦叠加 + 偶尔的停顿，模拟音节节奏
           const gate = Math.sin(t * 1.9) > -0.72 ? 1 : 0.18;
           const wave =
             (Math.sin(t * 12.4) * 0.5 + 0.5) * 0.55 +
@@ -102,55 +140,36 @@
         }
         smile = 0.4 + Math.sin(t * 5) * 0.2;
       } else if (this.state === "listening") {
-        target = 0.04 + Math.max(0, this.energy || 0) * 0.2;
-        smile = 0.15;
+        target = 0.02;
+        smile = 0.2;
       } else if (this.state === "thinking") {
         target = 0.015;
         smile = 0;
       } else {
-        target = 0.015 + (Math.sin(t * 1.1) * 0.5 + 0.5) * 0.02;
+        target = 0.015;
       }
 
       this.level += (target - this.level) * Math.min(1, dt * 14);
       this.drawMouth(this.level, smile);
 
-      // 眨眼
-      if (now > this.nextBlink) {
-        this.blinkStart = now;
-        this.nextBlink = now + 2600 + Math.random() * 3600;
+      // 头部微动：作用于整张照片容器，保证口型绝对对齐
+      if (this.container) {
+        let dy = Math.sin(t * 1.2) * 3;
+        let rot = Math.sin(t * 0.5) * 0.4;
+        if (this.state === "listening") {
+          dy += 2;
+          rot += 0.8;
+        }
+        if (this.state === "thinking") {
+          rot -= 1.2;
+          dy -= 1;
+        }
+        if (this.state === "speaking") {
+          dy += Math.sin(t * 3.1) * 1.6;
+          rot += Math.sin(t * 1.9) * 0.7;
+        }
+        this.container.style.transform = `translateY(${dy.toFixed(2)}px) rotate(${rot.toFixed(2)}deg) scale(1.04)`;
       }
-      const bp = (now - this.blinkStart) / 150;
-      const blinkScale = bp >= 0 && bp <= 1 ? 1 - Math.sin(bp * Math.PI) * 0.92 : 1;
-      this.eyes.forEach((eye, i) => {
-        const cy = 193;
-        eye.setAttribute("transform", `translate(0 ${cy}) scale(1 ${blinkScale.toFixed(3)}) translate(0 ${-cy})`);
-      });
-
-      // 注视方向
-      let lookX = 0;
-      let lookY = 0;
-      if (this.state === "thinking") { lookX = -1.6; lookY = -2.4; }
-      else if (this.state === "listening") { lookX = 0.8; lookY = 0.6; }
-      else if (this.state === "speaking") { lookX = Math.sin(t * 1.4) * 1.4; lookY = Math.cos(t * 1.1) * 0.8; }
-      this.irises.forEach((g) => {
-        g.setAttribute("transform", `translate(${lookX.toFixed(2)} ${lookY.toFixed(2)})`);
-      });
-
-      // 头部微动
-      let dx = 0;
-      let dy = Math.sin(t * 1.35) * 1.4;
-      let rot = Math.sin(t * 0.55) * 0.5;
-      if (this.state === "listening") { dy += 1.6; rot += 1.5; }
-      if (this.state === "thinking") { rot -= 2.6; dx -= 1.6; dy -= 1; }
-      if (this.state === "speaking") { dy += Math.sin(t * 3.1) * 1.4; rot += Math.sin(t * 1.9) * 1.4; }
-      this.head.setAttribute("transform", `translate(${dx.toFixed(2)} ${dy.toFixed(2)}) rotate(${rot.toFixed(2)} 210 300)`);
-
-      // 眉毛
-      let browLift = 0;
-      if (this.state === "listening") browLift = -2.6;
-      if (this.state === "thinking") browLift = -1.4 + Math.sin(t * 2) * 0.6;
-      if (this.state === "speaking") browLift = Math.sin(t * 4.2) * 1.1;
-      this.brows.setAttribute("transform", `translate(0 ${browLift.toFixed(2)})`);
 
       this.raf = requestAnimationFrame(this.loop);
     }
