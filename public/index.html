@@ -1,0 +1,447 @@
+<!DOCTYPE html>
+<html lang="zh-CN">
+<head>
+<meta charset="UTF-8" />
+<meta name="viewport" content="width=device-width, initial-scale=1.0" />
+<title>镜界 MIRROR · AI 数字人陪练</title>
+<link rel="icon" href="data:image/svg+xml,%3Csvg xmlns='http://www.w3.org/2000/svg' viewBox='0 0 32 32'%3E%3Crect width='32' height='32' rx='8' fill='%230b1116'/%3E%3Ccircle cx='16' cy='13' r='5' fill='%234fe0c0'/%3E%3Cpath d='M6 30c1-7 5-11 10-11s9 4 10 11z' fill='%23f2ede4'/%3E%3C/svg%3E" />
+<link rel="stylesheet" href="/css/style.css" />
+</head>
+<body>
+<div class="app">
+
+  <!-- ================= 顶栏 ================= -->
+  <header class="topbar">
+    <div class="brand">
+      <div class="brand-mark" aria-hidden="true">
+        <svg viewBox="0 0 40 40">
+          <rect x="1" y="1" width="38" height="38" rx="11" stroke="currentColor" stroke-width="1.4" fill="none" opacity=".35"/>
+          <circle cx="20" cy="16" r="6.2" fill="none" stroke="currentColor" stroke-width="1.8"/>
+          <path d="M9 35c1.2-7.5 5.4-12 11-12s9.8 4.5 11 12" fill="none" stroke="currentColor" stroke-width="1.8" stroke-linecap="round"/>
+          <circle cx="20" cy="16" r="2" fill="currentColor"/>
+        </svg>
+      </div>
+      <div class="brand-text">
+        <strong>镜界 <em>MIRROR</em></strong>
+        <span>AI 数字人陪练 · Windows Demo</span>
+      </div>
+    </div>
+
+    <div class="top-meta">
+      <div class="chip" id="statusChip"><i class="dot"></i><span>正在初始化</span></div>
+      <div class="clock" id="sessionClock" title="本次会话时长">00:00</div>
+      <button class="ghost-btn" id="btnSettings">
+        <svg viewBox="0 0 24 24" class="ico"><path d="M12 15.5a3.5 3.5 0 100-7 3.5 3.5 0 000 7z" fill="none" stroke="currentColor" stroke-width="1.6"/><path d="M19.4 15a1.7 1.7 0 00.34 1.87l.06.06a2 2 0 11-2.83 2.83l-.06-.06a1.7 1.7 0 00-1.87-.34 1.7 1.7 0 00-1 1.55V21a2 2 0 11-4 0v-.09a1.7 1.7 0 00-1.11-1.55 1.7 1.7 0 00-1.87.34l-.06.06a2 2 0 11-2.83-2.83l.06-.06A1.7 1.7 0 004.6 15a1.7 1.7 0 00-1.55-1H3a2 2 0 110-4h.09A1.7 1.7 0 004.6 9a1.7 1.7 0 00-.34-1.87l-.06-.06a2 2 0 112.83-2.83l.06.06A1.7 1.7 0 009 4.6a1.7 1.7 0 001-1.55V3a2 2 0 114 0v.09a1.7 1.7 0 001 1.55 1.7 1.7 0 001.87-.34l.06-.06a2 2 0 112.83 2.83l-.06.06A1.7 1.7 0 0019.4 9c.14.63.69 1.09 1.35 1.09H21a2 2 0 110 4h-.09a1.7 1.7 0 00-1.51 1z" fill="none" stroke="currentColor" stroke-width="1.3"/></svg>
+        设置
+      </button>
+    </div>
+  </header>
+
+  <div class="notice" id="noticeBar" hidden>
+    <span class="notice-ico">!</span>
+    <p id="noticeText">尚未配置大模型 API Key，请先完成配置后再开始对话。</p>
+    <button class="mini-btn" id="noticeAction">去配置</button>
+  </div>
+
+  <!-- ================= 主工作区 ================= -->
+  <main class="workspace">
+
+    <!-- 左：数字人舞台 -->
+    <section class="stage-col">
+      <div class="stage" id="stage" data-state="idle" data-avatar="ava">
+        <div class="stage-grid"></div>
+        <div class="stage-glow"></div>
+        <div class="stage-orbit orbit-a"></div>
+        <div class="stage-orbit orbit-b"></div>
+        <div class="stage-scan"></div>
+        <span class="corner tl"></span><span class="corner tr"></span>
+        <span class="corner bl"></span><span class="corner br"></span>
+
+        <div class="stage-top">
+          <span class="live-pill"><i></i>LIVE</span>
+          <span class="stage-scene" id="stageScene">日常闲聊</span>
+          <span class="stage-level" id="stageLevel">A2 - B1</span>
+        </div>
+
+        <div class="avatar-box">
+          <svg id="avatar" viewBox="0 0 420 500" preserveAspectRatio="xMidYMax meet" aria-label="数字人形象">
+            <defs>
+              <linearGradient id="gSkin" x1="0" y1="0" x2="0.3" y2="1">
+                <stop offset="0" stop-color="#f8d7bb"/><stop offset="0.55" stop-color="#f0c4a2"/><stop offset="1" stop-color="#dfa985"/>
+              </linearGradient>
+              <linearGradient id="gSkinShade" x1="0" y1="0" x2="1" y2="0">
+                <stop offset="0" stop-color="#c98f6c"/><stop offset="1" stop-color="#e6b491"/>
+              </linearGradient>
+              <linearGradient id="gHairAva" x1="0" y1="0" x2="0.4" y2="1">
+                <stop offset="0" stop-color="#4a3229"/><stop offset="0.5" stop-color="#33231d"/><stop offset="1" stop-color="#241813"/>
+              </linearGradient>
+              <linearGradient id="gHairLeo" x1="0" y1="0" x2="0.4" y2="1">
+                <stop offset="0" stop-color="#333a44"/><stop offset="0.6" stop-color="#222830"/><stop offset="1" stop-color="#151a20"/>
+              </linearGradient>
+              <linearGradient id="gBlazer" x1="0" y1="0" x2="0.7" y2="1">
+                <stop offset="0" stop-color="#31495b"/><stop offset="0.55" stop-color="#203340"/><stop offset="1" stop-color="#14212b"/>
+              </linearGradient>
+              <linearGradient id="gShirt" x1="0" y1="0" x2="0" y2="1">
+                <stop offset="0" stop-color="#f2ece0"/><stop offset="1" stop-color="#d6ccba"/>
+              </linearGradient>
+              <linearGradient id="gRim" x1="0" y1="0" x2="1" y2="0.4">
+                <stop offset="0" stop-color="#4fe0c0" stop-opacity="0"/><stop offset="1" stop-color="#7cf3db"/>
+              </linearGradient>
+              <linearGradient id="gLips" x1="0" y1="0" x2="0" y2="1">
+                <stop offset="0" stop-color="#c96a63"/><stop offset="1" stop-color="#b2504c"/>
+              </linearGradient>
+              <radialGradient id="gHalo" cx="0.5" cy="0.5" r="0.5">
+                <stop offset="0" stop-color="#4fe0c0" stop-opacity="0.28"/>
+                <stop offset="0.6" stop-color="#4fe0c0" stop-opacity="0.06"/>
+                <stop offset="1" stop-color="#4fe0c0" stop-opacity="0"/>
+              </radialGradient>
+              <linearGradient id="gShoulderLight" x1="0" y1="0" x2="1" y2="0">
+                <stop offset="0" stop-color="#4fe0c0" stop-opacity="0"/>
+                <stop offset="0.5" stop-color="#4fe0c0" stop-opacity="0.65"/>
+                <stop offset="1" stop-color="#4fe0c0" stop-opacity="0"/>
+              </linearGradient>
+            </defs>
+
+            <ellipse cx="210" cy="300" rx="180" ry="180" fill="url(#gHalo)"/>
+
+            <!-- 身体 -->
+            <g id="avBody">
+              <!-- 颈 -->
+              <path d="M190 266h40l7 82h-54z" fill="url(#gSkinShade)"/>
+              <path d="M190 266h40l2 24c-12 10-32 10-44 0z" fill="#c98f6c" opacity=".5"/>
+              <!-- 西装 -->
+              <path d="M44 500c6-66 48-112 100-138l66 46 66-46c52 26 94 72 100 138z" fill="url(#gBlazer)"/>
+              <!-- 衬衫 -->
+              <path d="M192 344h36v30l-18 24-18-24z" fill="url(#gShirt)"/>
+              <path d="M192 344v30l4-4v-26z" fill="#f8f3e8" opacity=".7"/>
+              <path d="M228 344v30l-4-4v-26z" fill="#d0c6b4" opacity=".8"/>
+              <!-- 翻领 -->
+              <path d="M184 344l26 52-18 104-30-140z" fill="#17252f"/>
+              <path d="M236 344l-26 52 18 104 30-140z" fill="#1d2f3c"/>
+              <path d="M184 344l26 52-5 8-25-54z" fill="#2c3f4d" opacity=".8"/>
+              <path d="M236 344l-26 52 5 8 25-54z" fill="#354c5d" opacity=".8"/>
+              <path d="M210 396V500" stroke="#0d1a23" stroke-width="1.6" opacity=".65"/>
+              <!-- 肩部轮廓光 -->
+              <path d="M64 478c10-36 36-62 68-78" stroke="url(#gShoulderLight)" stroke-width="2.6" fill="none" opacity=".6"/>
+              <path d="M356 478c-10-36-36-62-68-78" stroke="url(#gShoulderLight)" stroke-width="2.2" fill="none" opacity=".38"/>
+            </g>
+
+            <!-- 头部 -->
+            <g id="avHead">
+              <!-- 后发 -->
+              <g id="avHairBack">
+                <path d="M116 336c-24-70-26-164 4-208 26-38 62-54 90-54s64 16 90 54c30 44 28 138 4 208-4-56-16-106-32-136-24-30-48-42-62-42s-38 12-62 42c-16 30-28 80-32 136z" fill="url(#gHairAva)"/>
+                <path d="M126 214c-10 44-10 96-6 132 12-16 18-52 18-86z" fill="#3a2720"/>
+                <path d="M294 214c10 44 10 96 6 132-12-16-18-52-18-86z" fill="#3a2720"/>
+              </g>
+
+              <!-- 耳朵 -->
+              <ellipse cx="130" cy="190" rx="12" ry="19" fill="url(#gSkinShade)"/>
+              <ellipse cx="290" cy="190" rx="12" ry="19" fill="url(#gSkinShade)"/>
+
+              <!-- 脸 -->
+              <path d="M210 84c46 0 78 32 80 80 2 44-18 84-44 106-14 12-26 18-36 18s-22-6-36-18c-26-22-46-62-44-106 2-48 34-80 80-80z" fill="url(#gSkin)"/>
+
+              <!-- 腮红 -->
+              <ellipse cx="164" cy="228" rx="17" ry="10" fill="#ef9a86" opacity=".26"/>
+              <ellipse cx="256" cy="228" rx="17" ry="10" fill="#ef9a86" opacity=".26"/>
+
+              <!-- 前发 Ava -->
+              <g id="avHairAva">
+                <path d="M126 186c-6-68 26-112 84-112s90 44 84 112c-8-52-32-78-84-78s-76 26-84 78z" fill="url(#gHairAva)"/>
+                <path d="M134 152c3-40 34-64 76-64s73 24 76 64c-14-16-30-24-48-22-20 2-34 10-46 22-14 14-40 18-58 0z" fill="url(#gHairAva)"/>
+                <path d="M162 96c14-8 32-12 48-12" stroke="#5b4033" stroke-width="2" fill="none" opacity=".55"/>
+              </g>
+
+              <!-- 前发 Leo -->
+              <g id="avHairLeo" style="display:none">
+                <path d="M126 186c-6-68 26-112 84-112s90 44 84 112c-8-52-32-78-84-78s-76 26-84 78z" fill="url(#gHairLeo)"/>
+                <path d="M130 156c0-48 36-76 80-76s80 28 80 76c-8-26-24-40-42-42-22-2-38 6-50 18-14 12-36 26-68 24z" fill="url(#gHairLeo)"/>
+                <path d="M126 158c-4 12-4 26 0 34 4-6 6-20 4-30z" fill="#20262e"/>
+                <path d="M294 158c4 12 4 26 0 34-4-6-6-20-4-30z" fill="#20262e"/>
+              </g>
+
+              <!-- 眉毛 -->
+              <g id="avBrows" fill="none" stroke="#3d2a22" stroke-width="4.6" stroke-linecap="round">
+                <path d="M162 172c11-5.6 24-5.6 34 0"/>
+                <path d="M224 172c10-5.6 23-5.6 34 0"/>
+              </g>
+
+              <!-- 眼睛 -->
+              <g id="avEyes">
+                <g class="eye eye-l">
+                  <ellipse cx="180" cy="193" rx="15" ry="9.4" fill="#fbf5ec"/>
+                  <g class="iris" data-cx="180" data-cy="193">
+                    <circle cx="180" cy="193" r="7.4" fill="#6b4a33"/>
+                    <circle cx="180" cy="193" r="3.1" fill="#22150e"/>
+                    <circle cx="182.8" cy="190" r="2.2" fill="#fff" opacity=".85"/>
+                  </g>
+                  <path d="M165.4 190.4c4.6-5.2 10.6-7.2 16.4-6.2" stroke="#3d2a22" stroke-width="2.6" fill="none" opacity=".72" stroke-linecap="round"/>
+                  <path d="M166 198.6c4.6 2.4 10.2 3.2 15.6 2.8" stroke="#cf9277" stroke-width="1.3" fill="none" opacity=".5" stroke-linecap="round"/>
+                </g>
+                <g class="eye eye-r">
+                  <ellipse cx="240" cy="193" rx="15" ry="9.4" fill="#fbf5ec"/>
+                  <g class="iris" data-cx="240" data-cy="193">
+                    <circle cx="240" cy="193" r="7.4" fill="#6b4a33"/>
+                    <circle cx="240" cy="193" r="3.1" fill="#22150e"/>
+                    <circle cx="242.8" cy="190" r="2.2" fill="#fff" opacity=".85"/>
+                  </g>
+                  <path d="M224.6 190.4c4.6-5.2 10.6-7.2 16.4-6.2" stroke="#3d2a22" stroke-width="2.6" fill="none" opacity=".72" stroke-linecap="round"/>
+                  <path d="M224 198.6c4.6 2.4 10.2 3.2 15.6 2.8" stroke="#cf9277" stroke-width="1.3" fill="none" opacity=".5" stroke-linecap="round"/>
+                </g>
+              </g>
+
+              <!-- 鼻子 -->
+              <path d="M212 201c-2.6 9-5 15-1 19 2.4 2 5.8 1.2 7.6-1.4" fill="none" stroke="#cf9277" stroke-width="2" stroke-linecap="round" opacity=".72"/>
+              <ellipse cx="205.5" cy="221.5" rx="2.2" ry="1.3" fill="#c1866a" opacity=".55"/>
+              <ellipse cx="215.5" cy="221.5" rx="2.2" ry="1.3" fill="#c1866a" opacity=".4"/>
+
+              <!-- 嘴 -->
+              <g id="avMouth">
+                <path id="mouthCavity" d="" fill="#7a3b3b"/>
+                <rect id="mouthTeeth" x="200" y="245" width="20" height="4.6" rx="2.3" fill="#fff6ec" opacity="0"/>
+                <path id="mouthUpper" d="" fill="none" stroke="url(#gLips)" stroke-width="3.4" stroke-linecap="round"/>
+                <path id="mouthLower" d="" fill="none" stroke="#cf7b72" stroke-width="4" stroke-linecap="round"/>
+              </g>
+
+              <!-- 耳麦 -->
+              <g id="avHeadset" opacity=".95">
+                <path d="M127 176c-9 12-9 30 4 40" stroke="#334554" stroke-width="3" fill="none" stroke-linecap="round"/>
+                <rect x="122" y="196" width="12" height="22" rx="6" fill="#263642" transform="rotate(-8 128 207)"/>
+                <path d="M132 214c6 14 18 22 30 24" stroke="#3a4d5e" stroke-width="3.4" fill="none" stroke-linecap="round"/>
+                <rect x="164" y="231" width="20" height="9" rx="4.5" fill="#4fe0c0" transform="rotate(16 174 235.5)"/>
+                <circle cx="128.6" cy="207" r="2.4" fill="#4fe0c0" opacity=".85"/>
+              </g>
+
+              <!-- 轮廓光 -->
+              <path d="M286 138c10 28 10 66-2 96-10 26-30 48-52 60" fill="none" stroke="url(#gRim)" stroke-width="2.4" opacity=".5" stroke-linecap="round"/>
+            </g>
+          </svg>
+
+          <div class="avatar-name">
+            <strong id="avatarName">Ava</strong>
+            <span id="avatarRole">英语陪练教练 · American English</span>
+          </div>
+        </div>
+
+        <div class="subtitle" id="subtitle" hidden></div>
+
+        <div class="stage-bottom">
+          <div class="wave" id="wave"></div>
+          <div class="stage-status"><i class="pulse-dot"></i><span id="stageStatus">待机中 · 点击麦克风开始</span></div>
+        </div>
+      </div>
+
+      <!-- 控制台 -->
+      <div class="deck">
+        <div class="deck-main">
+          <button class="mic-btn" id="btnMic" aria-label="开始说话">
+            <svg viewBox="0 0 24 24" class="ico-mic"><path d="M12 3a3 3 0 013 3v6a3 3 0 11-6 0V6a3 3 0 013-3z" fill="none" stroke="currentColor" stroke-width="1.8"/><path d="M5.5 11.5a6.5 6.5 0 0013 0M12 18v3M9 21h6" fill="none" stroke="currentColor" stroke-width="1.8" stroke-linecap="round"/></svg>
+            <svg viewBox="0 0 24 24" class="ico-stop"><rect x="7" y="7" width="10" height="10" rx="2.5" fill="currentColor"/></svg>
+          </button>
+          <div class="deck-hint">
+            <strong id="deckTitle">按下开始说话</strong>
+            <span id="deckSub">支持语音对话，也可以直接输入文字</span>
+          </div>
+          <div class="deck-actions">
+            <button class="tool-btn" id="btnText" title="展开文字输入">
+              <svg viewBox="0 0 24 24"><path d="M4 6h16M4 12h10M4 18h7" stroke="currentColor" stroke-width="1.8" stroke-linecap="round" fill="none"/></svg>文字
+            </button>
+            <button class="tool-btn" id="btnReplay" title="重播上一句 AI 语音">
+              <svg viewBox="0 0 24 24"><path d="M4 12a8 8 0 1114.6 4.6M4 12V7m0 5h5" stroke="currentColor" stroke-width="1.8" fill="none" stroke-linecap="round" stroke-linejoin="round"/></svg>重播
+            </button>
+            <button class="tool-btn accent" id="btnEvaluate" title="结束本次练习并生成能力评估">
+              <svg viewBox="0 0 24 24"><path d="M4 19V9m5 10V5m5 14v-7m5 7V8" stroke="currentColor" stroke-width="1.9" stroke-linecap="round"/></svg>结束评估
+            </button>
+            <button class="tool-btn" id="btnReset" title="重置本次对话">重置</button>
+          </div>
+        </div>
+
+        <div class="quick-row" id="quickRow"></div>
+
+        <div class="composer" id="composer">
+          <textarea id="textInput" rows="1" placeholder="输入你想说的话，Enter 发送 · Shift+Enter 换行"></textarea>
+          <button id="btnSend" class="send-btn">发送</button>
+          <button id="btnCloseComposer" class="close-composer" title="收起">×</button>
+        </div>
+      </div>
+    </section>
+
+    <!-- 右：控制台 -->
+    <aside class="console">
+      <div class="console-tabs" role="tablist">
+        <button class="tab active" data-tab="chat">对话记录</button>
+        <button class="tab" data-tab="eval">能力评估</button>
+        <button class="tab" data-tab="history">历史会话</button>
+        <button class="scenario-btn" id="btnScenario">切换场景</button>
+      </div>
+
+      <div class="panel active" id="panel-chat">
+        <div class="chat-list" id="chatList"></div>
+        <div class="chat-foot">
+          <span id="turnCounter">0 轮对话</span>
+          <span class="foot-sep"></span>
+          <span id="savedHint">本地自动保存</span>
+        </div>
+      </div>
+
+      <div class="panel" id="panel-eval">
+        <div class="empty-state" id="evalEmpty">
+          <div class="empty-ring"><span>?</span></div>
+          <strong>还没有评估报告</strong>
+          <p>完成几轮对话后，点击左下角「结束评估」，系统会从多个维度给出评分与改进建议。</p>
+        </div>
+        <div class="eval-body" id="evalBody" hidden></div>
+      </div>
+
+      <div class="panel" id="panel-history">
+        <div class="history-head">
+          <strong>本地会话记录</strong>
+          <span>JSON 存储 · 可导出</span>
+        </div>
+        <div class="history-list" id="historyList"></div>
+      </div>
+    </aside>
+  </main>
+</div>
+
+<!-- ================= 场景选择 ================= -->
+<div class="modal" id="scenarioModal" hidden>
+  <div class="modal-mask" data-close></div>
+  <div class="modal-card wide">
+    <header class="modal-head">
+      <div>
+        <span class="eyebrow">TRAINING SCENARIO</span>
+        <h2>选择一个陪练场景</h2>
+      </div>
+      <button class="close-btn" data-close>×</button>
+    </header>
+    <div class="scenario-groups">
+      <div class="scenario-group">
+        <div class="group-head"><span>英语口语陪练</span><em>ENGLISH</em></div>
+        <div class="scenario-grid" id="scenarioEnglish"></div>
+      </div>
+      <div class="scenario-group">
+        <div class="group-head"><span>企业培训陪练</span><em>ENTERPRISE</em></div>
+        <div class="scenario-grid" id="scenarioEnterprise"></div>
+      </div>
+    </div>
+  </div>
+</div>
+
+<!-- ================= 设置 ================= -->
+<div class="modal" id="settingsModal" hidden>
+  <div class="modal-mask" data-close></div>
+  <div class="modal-card settings">
+    <header class="modal-head">
+      <div>
+        <span class="eyebrow">CONFIGURATION</span>
+        <h2>服务配置</h2>
+      </div>
+      <button class="close-btn" data-close>×</button>
+    </header>
+
+    <div class="settings-scroll">
+      <section class="setting-block">
+        <div class="block-head"><strong>大模型 LLM</strong><span>会话与评估的核心</span></div>
+        <div class="form-grid">
+          <label class="field span2"><span>Base URL</span><input id="cfgLlmBase" type="text" placeholder="https://api.a6api.com/v1" /></label>
+          <label class="field span2"><span>API Key</span>
+            <div class="input-wrap">
+              <input id="cfgLlmKey" type="password" placeholder="sk-..." autocomplete="off" />
+              <button class="reveal" id="btnRevealKey" type="button">显示</button>
+            </div>
+          </label>
+          <label class="field"><span>模型名称</span><input id="cfgLlmModel" type="text" list="modelList" placeholder="gpt-6-luna" /><datalist id="modelList"></datalist></label>
+          <label class="field"><span>Max Tokens</span><input id="cfgLlmTokens" type="number" min="100" max="4000" step="50" /></label>
+          <label class="field span2"><span>Temperature <em id="tempValue">0.7</em></span>
+            <input id="cfgTemp" type="range" min="0" max="1.2" step="0.05" />
+          </label>
+        </div>
+        <div class="block-actions">
+          <button class="mini-btn" id="btnTestLlm">测试连接</button>
+          <button class="mini-btn subtle" id="btnLoadModels">拉取模型列表</button>
+          <span class="test-result" id="testResult"></span>
+        </div>
+        <p class="hint">该网关兼容 OpenAI 协议。Key 仅保存在本机 <code>data/config.json</code>，不会上传。</p>
+      </section>
+
+      <section class="setting-block">
+        <div class="block-head"><strong>语音识别 ASR</strong><span>把你说的话转成文字</span></div>
+        <div class="seg" id="asrModeSeg">
+          <button data-value="browser" class="active">浏览器识别 · 免配置</button>
+          <button data-value="api">云端 API</button>
+        </div>
+        <div class="api-fields" id="asrApiFields" hidden>
+          <label class="field span2"><span>Base URL</span><input id="cfgAsrBase" type="text" placeholder="https://your-asr-provider/v1" /></label>
+          <label class="field span2"><span>API Key</span><input id="cfgAsrKey" type="password" placeholder="sk-..." autocomplete="off" /></label>
+          <label class="field"><span>模型</span><input id="cfgAsrModel" type="text" placeholder="whisper-1" /></label>
+          <label class="field"><span>识别语言</span><input id="cfgAsrLang" type="text" placeholder="en" /></label>
+        </div>
+        <p class="hint">浏览器识别依赖 Chrome 的语音服务，若网络受限会提示失败，可切换为云端 API（需支持 <code>/audio/transcriptions</code>）。无论如何都可以用文字输入继续训练。</p>
+      </section>
+
+      <section class="setting-block">
+        <div class="block-head"><strong>语音合成 TTS</strong><span>数字人说话的声音</span></div>
+        <div class="seg" id="ttsModeSeg">
+          <button data-value="browser" class="active">系统语音 · 免配置</button>
+          <button data-value="api">云端 API</button>
+        </div>
+        <div class="form-grid">
+          <label class="field"><span>音色</span><select id="cfgTtsVoice"></select></label>
+          <label class="field"><span>语速 <em id="rateValue">0.98</em></span><input id="cfgTtsRate" type="range" min="0.6" max="1.4" step="0.02" /></label>
+        </div>
+        <div class="api-fields" id="ttsApiFields" hidden>
+          <label class="field span2"><span>Base URL</span><input id="cfgTtsBase" type="text" placeholder="https://your-tts-provider/v1" /></label>
+          <label class="field span2"><span>API Key</span><input id="cfgTtsKey" type="password" placeholder="sk-..." autocomplete="off" /></label>
+          <label class="field"><span>模型</span><input id="cfgTtsModel" type="text" placeholder="tts-1" /></label>
+          <label class="field"><span>Voice</span><input id="cfgTtsVoiceApi" type="text" placeholder="alloy" /></label>
+        </div>
+      </section>
+
+      <section class="setting-block">
+        <div class="block-head"><strong>交互与形象</strong><span>影响演示体验</span></div>
+        <div class="form-grid">
+          <label class="field"><span>数字人形象</span>
+            <select id="cfgAvatar"><option value="ava">Ava · 女性教练</option><option value="leo">Leo · 男性教练</option></select>
+          </label>
+          <label class="field"><span>自动接听</span>
+            <select id="cfgAutoListen"><option value="true">开启 · 回复后自动聆听</option><option value="false">关闭 · 手动点击麦克风</option></select>
+          </label>
+          <label class="field"><span>字幕</span>
+            <select id="cfgSubtitles"><option value="true">显示数字人字幕</option><option value="false">隐藏字幕</option></select>
+          </label>
+        </div>
+      </section>
+    </div>
+
+    <footer class="modal-foot">
+      <button class="ghost-btn" data-close>取消</button>
+      <button class="primary-btn" id="btnSaveConfig">保存配置</button>
+    </footer>
+  </div>
+</div>
+
+<!-- 历史预览浮层 -->
+<div class="modal" id="replayModal" hidden>
+  <div class="modal-mask" data-close></div>
+  <div class="modal-card replay">
+    <header class="modal-head">
+      <div><span class="eyebrow">SESSION REPLAY</span><h2 id="replayTitle">会话回放</h2></div>
+      <button class="close-btn" data-close>×</button>
+    </header>
+    <div class="replay-body" id="replayBody"></div>
+    <footer class="modal-foot">
+      <button class="ghost-btn" id="btnReplayExport">导出 JSON</button>
+      <button class="primary-btn" id="btnReplayLoad">载入到对话区</button>
+    </footer>
+  </div>
+</div>
+
+<div class="toast-stack" id="toastStack"></div>
+
+<script src="/js/avatar.js"></script>
+<script src="/js/speech.js"></script>
+<script src="/js/app.js"></script>
+</body>
+</html>
