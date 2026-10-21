@@ -441,12 +441,17 @@
           });
           let data = {};
           try { data = await res.json(); } catch (e) {}
-          if (!res.ok) throw new Error((data.error && data.error.message) || "语音识别服务返回错误");
+          if (!res.ok) {
+            const msg = (data.error && data.error.message) || "语音识别服务返回错误";
+            const err = new Error(msg);
+            err.code = "cloud-failed";
+            throw err;
+          }
           const text = (data.text || "").trim();
           if (!text) throw new Error("没有识别到内容，请再说一次");
           if (opts.onFinal) opts.onFinal(text);
         } catch (err) {
-          if (opts.onError) opts.onError(err);
+          if (opts.onError) opts.onError(err, err.code || "cloud-failed");
         }
       };
 
