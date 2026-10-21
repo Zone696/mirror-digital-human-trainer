@@ -1,0 +1,30 @@
+{
+  "llm": {
+    "baseUrl": "https://api.a6api.com/v1",
+    "apiKey": "",
+    "model": "gpt-6-luna",
+    "temperature": 0.7,
+    "maxTokens": 700
+  },
+  "asr": {
+    "mode": "browser",
+    "baseUrl": "",
+    "apiKey": "",
+    "model": "whisper-1",
+    "language": "en"
+  },
+  "tts": {
+    "mode": "browser",
+    "baseUrl": "",
+    "apiKey": "",
+    "model": "tts-1",
+    "voice": "alloy",
+    "rate": 0.98
+  },
+  "ui": {
+    "avatar": "ava",
+    "autoListen": true,
+    "subtitles": true,
+    "showTranslation": false
+  }
+}
