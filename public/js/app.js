@@ -17,6 +17,7 @@
     speaking: false,
     readOnly: false,
     asrModeUsed: "browser",
+    asrCloudFailed: false,
     lastAssistantText: "",
     replayRecord: null,
     voiceList: [],
@@ -635,7 +636,7 @@
     state.listening = true;
     speakToken++;
     const cfg = state.config;
-    state.asrModeUsed = cfg.asr.mode === "api" && cfg.asr.hasKey && cfg.asr.baseUrl ? "api" : "browser";
+    state.asrModeUsed = cfg.asr.mode === "api" && cfg.asr.hasKey && cfg.asr.baseUrl && !state.asrCloudFailed ? "api" : "browser";
     updateMicUI(true);
     setStageState("listening");
     showSubtitle("", true);
@@ -652,6 +653,12 @@
       },
       onError: (err, code) => {
         endListeningUI();
+        if (code === "cloud-failed" && !state.asrCloudFailed && ("webkitSpeechRecognition" in window || "SpeechRecognition" in window)) {
+          state.asrCloudFailed = true;
+          toast("云端语音识别不可用，已自动切换为浏览器识别", "warn");
+          setTimeout(() => { if (!state.busy && !state.readOnly) toggleMic(); }, 450);
+          return;
+        }
         if (!err || !err.message) return;
         toast(err.message, code === "no-speech" ? "warn" : "error");
         if (code === "network" || code === "not-allowed" || code === "service-not-allowed") {
