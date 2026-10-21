@@ -94,7 +94,7 @@ def load_config():
     cfg = json.loads(json.dumps(DEFAULT_CONFIG))
     if os.path.exists(CONFIG_PATH):
         try:
-            with open(CONFIG_PATH, "r", encoding="utf-8") as f:
+            with open(CONFIG_PATH, "r", encoding="utf-8-sig") as f:
                 cfg = deep_merge(cfg, json.load(f))
         except Exception as exc:  # 配置损坏时回退默认值，避免服务无法启动
             print(f"[config] 读取失败，使用默认配置: {exc}")
@@ -634,6 +634,15 @@ class Handler(BaseHTTPRequestHandler):
             with urllib.request.urlopen(req, timeout=90) as resp:
                 data = json.loads(resp.read().decode("utf-8", "ignore"))
             return self._send_json({"text": (data.get("text") or "").strip()})
+        except urllib.error.HTTPError as exc:
+            raw = exc.read().decode("utf-8", "ignore")
+            # 网关在无法处理音频转写时会返回 500 + request_id，转成可操作建议
+            if exc.code >= 500 or "request_id" in raw:
+                return self._send_json(
+                    {"error": {"message": "云端语音识别失败：当前网关不支持音频转写（模型列表中无音频模型）。请在设置中将 ASR 切换为「浏览器识别」。"}},
+                    502,
+                )
+            return self._send_json({"error": {"message": upstream_error(exc)}}, 502)
         except Exception as exc:
             return self._send_json({"error": {"message": upstream_error(exc)}}, 502)
 
